@@ -1,55 +1,32 @@
 import React, { Component } from "react";
+import TOC from "./component/TOC.js";
+import Content from "./component/content.js";
+import Subject from "./component/subject.js";
 import "./App.css";
 
-class Subject extends Component {
-  render() {
-    return (
-      <header>
-        <h1>{this.props.title}</h1>
-        {this.props.sub}
-      </header>
-    );
-  }
-}
-
-class TOC extends Component {
-  render() {
-    return (
-      <nav>
-        <ul>
-          <li>
-            <a href="1.html">HTML</a>
-          </li>
-          <li>
-            <a href="2.html">CSS</a>
-          </li>
-          <li>
-            <a href="3.html">JS</a>
-          </li>
-        </ul>
-      </nav>
-    );
-  }
-}
-
-class Content extends Component {
-  render() {
-    return (
-      <article>
-        <h2>{this.props.title}</h2>
-        {this.props.desc}
-      </article>
-    );
-  }
-}
-
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      Subject: {
+        title: "WEB",
+        sub: "World Wide Web!!",
+      },
+    Contents: [
+      {id: 1, title: "HTML", desc: "HTML is information"},
+      {id: 2, title: "CSS", desc: "CSS is for Design"},
+      {id: 3, title: "JavaScript", desc: "JavaScript is for interactive"}
+    ]
+    };
+  }
   render() {
     return (
       <div className="App">
-        <Subject title="WEB" sub="world wide web!"/>
+        <Subject
+          title={this.state.Subject.title}
+          sub={this.state.Subject.sub} />
         <Subject title="react" sub="for UI" />
-        <TOC />
+        <TOC data={this.state.Contents} />
         <Content title="HTML" desc="HTML is HyperText Markup Language." />
       </div>
     );
