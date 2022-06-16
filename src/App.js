@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import TOC from "./component/TOC.js";
 import ReadContent from "./component/readContent.js";
 import CreateContent from "./component/createContent.js";
+import UpdateContent from "./component/updateContent.js";
 import Subject from "./component/subject.js";
 import Control from "./component/control.js";
 import "./App.css";
@@ -25,7 +26,23 @@ class App extends Component {
       ],
     };
   }
-  render() {
+
+  //get readContent 함수
+
+  getReadContent(){
+    var i = 0;
+    while(i < this.state.Contents.length){
+      var data = this.state.Contents[i];
+      if(data.id === this.state.selected_content_id){
+        return data;
+      }
+      i = i + 1;
+    }
+  }
+
+  //get content 함수
+
+  getContent() {
     console.log("App render");
     var _title,
       _desc,
@@ -33,32 +50,57 @@ class App extends Component {
     if (this.state.mode === "welcome") {
       _title = this.state.Welcome.title;
       _desc = this.state.Welcome.desc;
-      _article = <ReadContent title={_title} desc={_desc} />
+      _article = <ReadContent title={_title} desc={_desc} />;
     } else if (this.state.mode === "read") {
-      var i = 0;
-      while (i < this.state.Contents.length) {
-        var data = this.state.Contents[i];
-        if (data.id === this.state.selected_content_id) {
-          _title = data.title;
-          _desc = data.desc;
-          break;
-        }
-        i = i + 1;
-      }
-      _article = <ReadContent title={_title} desc={_desc} />
-    } else if(this.state.mode === "create"){
-      _article = <CreateContent onSubmit={function(_title, _desc){
-        this.max_content_id = this.max_content_id + 1;
-        var _contents = this.state.Contents.concat(
-          {id: this.max_content_id, title: _title, desc: _desc}
-        );
-        this.setState({
-          mode: "read",
-          selected_content_id: this.max_content_id,
-          Contents : _contents
-        });
-      }.bind(this)}/>
+      var _content = this.getReadContent();
+      _article = <ReadContent title={_content.title} desc={_content.desc} />;
+    } else if (this.state.mode === "create") {
+      _article = (
+        <CreateContent
+          onSubmit={function (_title, _desc) {
+            this.max_content_id = this.max_content_id + 1;
+            var _contents = this.state.Contents.concat({
+              id: this.max_content_id,
+              title: _title,
+              desc: _desc,
+            });
+            this.setState({
+              mode: "read",
+              selected_content_id: this.max_content_id,
+              Contents: _contents,
+            });
+          }.bind(this)}
+        />
+      );
+    } else if (this.state.mode === "update") {
+      var _content = this.getReadContent();
+      _article = (
+        <UpdateContent 
+        data = {_content}
+          onSubmit={function (_id, _title, _desc) {
+            var _contents = Array.from(this.state.Contents);
+            var i = 0;
+            while(i < _contents.length){
+              if(_contents[i].id === _id){
+                _contents[i] = {id: _id, title: _title, desc: _desc};
+                break;
+              }
+              i = i + 1;
+            }
+            this.setState({
+              Contents: _contents,
+              mode: "read"
+            });
+          }.bind(this)}
+        />
+      );
     }
+    return _article;
+  }
+
+  //렌더 함수
+
+  render() {
     return (
       <div className="App">
         <Subject
@@ -71,19 +113,21 @@ class App extends Component {
         <Subject title="react" sub="for UI" />
         <TOC
           onChangePage={function (id) {
-            this.setState({ 
+            this.setState({
               mode: "read",
-              selected_content_id: Number(id)
-             });
+              selected_content_id: Number(id),
+            });
           }.bind(this)}
           data={this.state.Contents}
         />
-        <Control onChangeMode={ function(_mode){
-          this.setState({
-            mode: _mode
-          });
-        }.bind(this)}/>
-        {_article}
+        <Control
+          onChangeMode={function (_mode) {
+            this.setState({
+              mode: _mode,
+            });
+          }.bind(this)}
+        />
+        {this.getContent()}
       </div>
     );
   }
