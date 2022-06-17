@@ -29,11 +29,11 @@ class App extends Component {
 
   //get readContent 함수
 
-  getReadContent(){
+  getReadContent() {
     var i = 0;
-    while(i < this.state.Contents.length){
+    while (i < this.state.Contents.length) {
       var data = this.state.Contents[i];
-      if(data.id === this.state.selected_content_id){
+      if (data.id === this.state.selected_content_id) {
         return data;
       }
       i = i + 1;
@@ -75,21 +75,21 @@ class App extends Component {
     } else if (this.state.mode === "update") {
       var _content = this.getReadContent();
       _article = (
-        <UpdateContent 
-        data = {_content}
+        <UpdateContent
+          data={_content}
           onSubmit={function (_id, _title, _desc) {
             var _contents = Array.from(this.state.Contents);
             var i = 0;
-            while(i < _contents.length){
-              if(_contents[i].id === _id){
-                _contents[i] = {id: _id, title: _title, desc: _desc};
+            while (i < _contents.length) {
+              if (_contents[i].id === _id) {
+                _contents[i] = { id: _id, title: _title, desc: _desc };
                 break;
               }
               i = i + 1;
             }
             this.setState({
               Contents: _contents,
-              mode: "read"
+              mode: "read",
             });
           }.bind(this)}
         />
@@ -122,9 +122,28 @@ class App extends Component {
         />
         <Control
           onChangeMode={function (_mode) {
-            this.setState({
-              mode: _mode,
-            });
+            if (_mode === "delete") {
+              if (window.confirm("really?")) {
+                var _contents = Array.from(this.state.Contents);
+                var i = 0;
+                while (i < _contents.length) {
+                  if (_contents[i].id === this.state.selected_content_id) {
+                    _contents.splice(i, 1);
+                    break;
+                  }
+                  i = i + 1;
+                }
+                this.setState({
+                  mode: "welcome",
+                  Contents: _contents,
+                });
+                alert("deleted :/");
+              }
+            } else {
+              this.setState({
+                mode: _mode,
+              });
+            }
           }.bind(this)}
         />
         {this.getContent()}
